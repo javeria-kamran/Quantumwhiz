@@ -5,7 +5,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
-api_key = st.secrets["GEMINI"]["GEMINI_API_KEY"]
+api_key = st.secrets["GEMINI"]["AIzaSyDwFPHkcbmGO7ynM4DSnrBmnCU-VqzSrpk"]
 genai.configure(api_key=api_key)
 ureg = pint.UnitRegistry()
 def convert_units(value, from_unit, to_unit):
