@@ -1,0 +1,4 @@
+streamlit==1.29.0
+pint==0.22
+google-generativeai
+python-dotenv
