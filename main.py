@@ -5,13 +5,20 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
-api_key = st.secrets["GEMINI"]["AIzaSyDwFPHkcbmGO7ynM4DSnrBmnCU-VqzSrpk"]
-genai.configure(api_key=api_key)
+# Load environment variables from .env file
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    st.error("⚠️ API Key not found! Make sure it's set in .env file.")
+else:
+    genai.configure(api_key=api_key)
+
 ureg = pint.UnitRegistry()
+
 def convert_units(value, from_unit, to_unit):
     try:
         if from_unit in ["celsius", "fahrenheit", "kelvin"] or to_unit in ["celsius", "fahrenheit", "kelvin"]:
-            # Handle temperature conversions separately
             if from_unit == "celsius" and to_unit == "fahrenheit":
                 result = (value * 9/5) + 32
             elif from_unit == "fahrenheit" and to_unit == "celsius":
@@ -32,11 +39,14 @@ def convert_units(value, from_unit, to_unit):
             return f"{value} {from_unit} = {result}"
     except pint.DimensionalityError:
         return "Invalid conversion"
+
 def ask_gemini(prompt):
     model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(prompt)
     return response.text if response else "Error fetching data"
+
 st.set_page_config(page_title="Unit Converter & AI Assistant", layout="wide")
+
 st.sidebar.title("About This Project")
 st.sidebar.markdown(
     """
@@ -49,6 +59,7 @@ st.sidebar.markdown(
     - Built using **Streamlit** for a sleek and interactive user experience.
     """
 )
+
 st.markdown("""
     <style>
     .stButton>button {
@@ -79,6 +90,7 @@ st.markdown("""
 
 st.title("The Unit Alchemist")
 st.markdown("Effortless, Precision-Driven Unit Conversion Powered by Cutting-Edge Technology.")
+
 unit_categories = {
     "Length": ["meter", "foot", "inch", "mile", "kilometer", "light_year"],
     "Mass": ["kilogram", "gram", "pound", "ounce", "ton"],
@@ -87,16 +99,14 @@ unit_categories = {
     "Speed": ["meter_per_second", "kilometer_per_hour", "mile_per_hour"],
     "Energy": ["joule", "calorie", "electron_volt"],
 }
-st.subheader("Enter Your Conversion")
 
+st.subheader("Enter Your Conversion")
 col1, col2, col3 = st.columns(3)
 
 with col1:
     value = st.number_input("Enter value:", value=1.0, step=0.1)
-
 with col2:
     category = st.selectbox("Select unit category:", list(unit_categories.keys()))
-
 with col3:
     from_unit = st.selectbox("Select from unit:", unit_categories[category])
 
@@ -109,6 +119,7 @@ if st.button("Convert"):
             st.success(f"✅ {result}")
         else:
             st.error("❌ Invalid conversion. Please check your units.")
+
 st.subheader("💬 Ask AI (Powered By Gemini)")
 user_query = st.text_area("Enter Your Question:")
 
